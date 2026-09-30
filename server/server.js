@@ -1,0 +1,29 @@
+const path = require('path')
+const fs = require('fs')
+const express = require('express')
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
+const dotenv = require('dotenv')
+
+dotenv.config()
+
+const app = express()
+const port = process.env.PORT || 5000
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173'
+const uploadsPath = path.join(__dirname, 'uploads')
+
+fs.mkdirSync(uploadsPath, { recursive: true })
+
+app.use(cors({ origin: clientUrl, credentials: true }))
+app.use(express.json())
+app.use(cookieParser())
+app.use('/uploads', express.static(uploadsPath))
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'PartsMarket server is running' })
+})
+
+app.listen(port, () => {
+  console.log(`PartsMarket server is running on port ${port}`)
+})
+

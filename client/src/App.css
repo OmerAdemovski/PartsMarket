@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root { --ink:#17211b; --muted:#69736c; --line:#dce4dc; --cream:#f7f8f3; --mint:#d9f4d7; --green:#2f8f59; --dark-green:#173f2b; --white:#fff; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; }
+button, input { font: inherit; }
+button, a { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.page-shell { max-width:1180px; margin:0 auto; padding:0 34px 46px; }
+.navbar { align-items:center; display:flex; justify-content:space-between; padding:28px 0; }
+.brand { font-family:'Space Grotesk', sans-serif; font-size:26px; font-weight:700; letter-spacing:-1px; }
+.brand span { color:var(--green); }
+.nav-links { align-items:center; display:flex; gap:24px; }
+.nav-links a { color:var(--muted); font-size:14px; }
+.primary-button, .outline-button, .dark-button { border:0; border-radius:8px; font-size:14px; font-weight:600; padding:12px 18px; }
+.primary-button { background:var(--green); color:var(--white); }
+.outline-button { background:transparent; border:1px solid var(--line); color:var(--ink); }
+.dark-button { background:var(--dark-green); color:var(--white); white-space:nowrap; }
+.hero-section { align-items:center; background:var(--mint); border-radius:18px; display:flex; min-height:500px; overflow:hidden; padding:72px 8%; }
+.hero-copy { max-width:570px; position:relative; z-index:1; }
+.eyebrow { color:var(--green); font-size:11px; font-weight:700; letter-spacing:1.8px; margin:0 0 18px; }
+h1, h2, h3 { font-family:'Space Grotesk', sans-serif; margin:0; }
+h1 { font-size:clamp(45px, 6vw, 76px); letter-spacing:-4px; line-height:.98; max-width:560px; }
+.hero-text { color:#4f6255; font-size:17px; line-height:1.65; margin:26px 0 30px; max-width:470px; }
+.search-box { background:var(--white); border-radius:8px; display:flex; max-width:510px; padding:5px; }
+.search-box input { background:transparent; border:0; color:var(--ink); min-width:0; outline:0; padding:12px 14px; width:100%; }
+.hero-art { height:390px; margin-left:auto; position:relative; width:370px; }
+.art-circle { border:2px solid rgba(47,143,89,.22); border-radius:50%; position:absolute; }
+.circle-one { height:300px; right:20px; top:45px; width:300px; }
+.circle-two { height:220px; right:60px; top:85px; width:220px; }
+.gear { color:var(--dark-green); font-size:205px; left:85px; line-height:1; position:absolute; top:88px; transform:rotate(18deg); }
+.spark { color:var(--green); font-size:32px; position:absolute; }
+.spark-one { right:18px; top:74px; }
+.spark-two { bottom:54px; left:50px; }
+.category-section { padding:86px 0 74px; }
+h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
+.category-grid { display:grid; gap:18px; grid-template-columns:repeat(3, 1fr); margin-top:34px; }
+.category-card { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:28px; }
+.category-icon { color:var(--green); display:block; font-size:30px; margin-bottom:25px; }
+.category-card h3 { font-size:19px; margin-bottom:9px; }
+.category-card p { color:var(--muted); font-size:14px; line-height:1.5; margin:0; }
+.sell-banner { align-items:center; background:#e9eee8; border-radius:12px; display:flex; justify-content:space-between; padding:35px 40px; }
+.sell-banner .eyebrow { margin-bottom:10px; }
+.sell-banner h2 { font-size:clamp(22px, 3vw, 32px); letter-spacing:-1px; max-width:580px; }
+@media (max-width:760px) {
+  .page-shell { padding:0 18px 28px; }
+  .navbar { padding:20px 0; }
+  .nav-links { gap:10px; }
+  .nav-links a, .nav-links .outline-button { display:none; }
+  .hero-section { min-height:0; padding:48px 24px 30px; }
+  .hero-art { display:none; }
+  h1 { letter-spacing:-2px; }
+  .search-box { display:block; }
+  .search-box .primary-button { margin:0 5px 5px; width:calc(100% - 10px); }
+  .category-section { padding:56px 0; }
+  .category-grid { grid-template-columns:1fr; }
+  .sell-banner { align-items:flex-start; flex-direction:column; gap:24px; padding:28px 24px; }
+}
