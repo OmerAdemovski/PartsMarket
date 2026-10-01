@@ -1,64 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
+import Header from './components/Header.jsx'
+import Account from './pages/Account.jsx'
+import Home from './pages/Home.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [currentUser, setCurrentUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
-  return (
-    <main className="page-shell">
-      <nav className="navbar">
-        <a className="brand" href="/">Parts<span>Market</span></a>
-        <div className="nav-links">
-          <a href="#browse">Browse parts</a>
-          <button type="button" className="outline-button">Log in</button>
-          <button type="button" className="primary-button">Sell a part</button>
-        </div>
-      </nav>
+  useEffect(() => {
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/me', { credentials: 'include' })
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentUser(data.user)
+        }
+      } catch {
+        // Logged out is the safe default if the API is unavailable.
+      } finally { setAuthLoading(false) }
+    }
+    loadCurrentUser()
+  }, [])
 
-      <section className="hero-section">
-        <div className="hero-copy">
-          <p className="eyebrow">THE SMARTER WAY TO REPAIR</p>
-          <h1>Good parts deserve a second life.</h1>
-          <p className="hero-text">
-            Find quality used car parts from real people, or turn the parts in
-            your garage into someone else’s perfect fix.
-          </p>
-          <div className="search-box">
-            <input
-              type="search"
-              placeholder="Search for a part, make, or model"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              aria-label="Search for car parts"
-            />
-            <button type="button" className="primary-button">Search</button>
-          </div>
-        </div>
-        <div className="hero-art" aria-label="Illustration of a car part" role="img">
-          <span className="art-circle circle-one"></span>
-          <span className="art-circle circle-two"></span>
-          <span className="gear">⚙</span>
-          <span className="spark spark-one">✦</span>
-          <span className="spark spark-two">✦</span>
-        </div>
-      </section>
+  async function handleLogout() {
+    try { await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' })
+    } finally { setCurrentUser(null) }
+  }
 
-      <section className="category-section" id="browse">
-        <p className="eyebrow">START HERE</p>
-        <h2>What are you looking for?</h2>
-        <div className="category-grid">
-          <article className="category-card"><span className="category-icon">◉</span><h3>Engine &amp; transmission</h3><p>Powertrain parts for your next repair.</p></article>
-          <article className="category-card"><span className="category-icon">▣</span><h3>Body &amp; exterior</h3><p>Panels, lights, mirrors, and more.</p></article>
-          <article className="category-card"><span className="category-icon">◇</span><h3>Interior &amp; accessories</h3><p>Make your car feel like new again.</p></article>
-        </div>
-      </section>
+  if (authLoading) return <main className="page-shell loading-page">Checking your account...</main>
 
-      <section className="sell-banner">
-        <div><p className="eyebrow">HAVE PARTS TO SELL?</p><h2>Clear out your garage. Help another driver.</h2></div>
-        <button type="button" className="dark-button">Create a listing</button>
-      </section>
-    </main>
-  )
+  return <div className="page-shell"><Header currentUser={currentUser} onLogout={handleLogout} /><Routes>
+    <Route path="/" element={<Home />} /><Route path="/register" element={<Register onRegister={setCurrentUser} />} />
+    <Route path="/login" element={<Login onLogin={setCurrentUser} />} /><Route path="/account" element={<Account currentUser={currentUser} />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></div>
 }
 
 export default App
