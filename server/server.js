@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const connectDB = require('./config/db')
+const authRoutes = require('./routes/authRoutes')
 
 dotenv.config()
 
@@ -20,6 +21,7 @@ app.use(cors({ origin: clientUrl, credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
 app.use('/uploads', express.static(uploadsPath))
+app.use('/api/auth', authRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({
