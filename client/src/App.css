@@ -64,10 +64,65 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
 .account-details p { align-items:center; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; margin:0; padding:16px 0; }
 .account-details span { color:var(--muted); }
 .loading-page { padding-top:100px; text-align:center; }
+.listing-page { padding:48px 0 90px; }
+.listing-page h1, .details-copy h1 { font-size:clamp(38px, 6vw, 64px); letter-spacing:-3px; }
+.listing-heading { align-items:flex-end; display:flex; justify-content:space-between; }
+.listing-filters { display:flex; gap:12px; margin:20px 0 28px; }
+.listing-filters input, .listing-filters select { background:var(--white); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:12px 14px; }
+.listing-filters input { flex:1; min-width:0; }
+.listing-filters select { min-width:190px; }
+.parts-grid { display:grid; gap:18px; grid-template-columns:repeat(3, 1fr); }
+.part-card { background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.part-card-link { display:block; }
+.part-card-image { background:#e9eee8; display:block; height:190px; object-fit:cover; width:100%; }
+.image-placeholder { align-items:center; color:var(--muted); display:flex; justify-content:center; }
+.part-card-content { padding:20px; }
+.part-card-heading { align-items:center; display:flex; justify-content:space-between; gap:12px; }
+.part-category { color:var(--green); font-size:11px; font-weight:700; letter-spacing:1px; margin:0; text-transform:uppercase; }
+.part-price { color:var(--dark-green); white-space:nowrap; }
+.part-card h2 { font-size:21px; letter-spacing:-.5px; margin:13px 0 8px; }
+.part-meta, .part-seller { color:var(--muted); font-size:13px; margin:5px 0; }
+.part-seller { border-top:1px solid var(--line); margin-top:16px; padding-top:14px; }
+.part-card-actions { border-top:1px solid var(--line); display:flex; gap:10px; padding:14px 20px 18px; }
+.danger-button { background:#fff0ed; border:1px solid #f1c8c0; border-radius:8px; color:#9c3b2d; font-size:14px; font-weight:600; padding:10px 14px; }
+.danger-button:disabled { cursor:wait; opacity:.6; }
+.modal-overlay { align-items:center; animation:modal-fade-in .2s ease-out; background:rgba(23,33,27,.58); display:flex; inset:0; justify-content:center; padding:20px; position:fixed; z-index:10; }
+.confirmation-modal { animation:modal-scale-in .22s ease-out; background:var(--white); border:1px solid var(--line); border-radius:16px; box-shadow:0 20px 60px rgba(23,33,27,.2); max-width:460px; padding:34px; width:100%; }
+.confirmation-modal h2 { font-size:clamp(25px, 5vw, 34px); letter-spacing:-1px; line-height:1.1; }
+.modal-warning { color:var(--muted); line-height:1.6; margin:16px 0 28px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+.modal-actions button { min-width:92px; }
+.modal-actions button:disabled { cursor:wait; opacity:.6; }
+.part-card-removing { animation:part-card-removing .32s ease-in forwards; pointer-events:none; }
+@keyframes modal-fade-in { from { opacity:0; } to { opacity:1; } }
+@keyframes modal-scale-in { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
+@keyframes part-card-removing { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(.94); } }
+.status-message { color:var(--muted); padding:34px 0; }
+.success-note { color:var(--green); font-size:14px; font-weight:600; }
+.details-page { padding:34px 0 90px; }
+.back-link { display:inline-block; margin-bottom:20px; }
+.details-card { background:var(--white); border:1px solid var(--line); border-radius:16px; display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); overflow:hidden; }
+.details-image { background:#e9eee8; display:block; min-height:500px; object-fit:cover; width:100%; }
+.details-copy { padding:48px; }
+.details-price { color:var(--dark-green); font-size:26px; font-weight:700; margin:20px 0; }
+.details-description { color:var(--muted); line-height:1.7; white-space:pre-wrap; }
+.details-list { border-top:1px solid var(--line); margin:30px 0; }
+.details-list p { border-bottom:1px solid var(--line); display:flex; gap:20px; justify-content:space-between; margin:0; padding:14px 0; }
+.details-list span { color:var(--muted); text-align:right; }
+.details-actions { display:flex; gap:12px; }
+.wide-form-card { max-width:760px; }
+.form-grid { display:grid; gap:8px 16px; grid-template-columns:1fr 1fr; }
+.part-form { margin-top:26px; }
+.part-form label { display:flex; flex-direction:column; font-size:14px; font-weight:600; gap:8px; margin-top:16px; }
+.part-form input, .part-form textarea { border:1px solid var(--line); border-radius:8px; padding:12px; resize:vertical; }
+.part-form input:focus, .part-form textarea:focus, .listing-filters input:focus, .listing-filters select:focus { border-color:var(--green); outline:2px solid var(--mint); }
+.form-image-preview { border-radius:8px; display:block; margin-top:18px; max-height:260px; max-width:100%; object-fit:cover; }
+.empty-card { background:var(--white); border:1px solid var(--line); border-radius:12px; margin-top:28px; padding:28px; }
+.empty-card p { color:var(--muted); margin-top:0; }
 @media (max-width:760px) {
   .page-shell { padding:0 18px 28px; }
   .navbar { padding:20px 0; }
-  .nav-links { gap:10px; }
+  .nav-links { flex-wrap:wrap; gap:10px; justify-content:flex-end; }
   .nav-links .browse-link { display:none; }
   .hero-section { min-height:0; padding:48px 24px 30px; }
   .hero-art { display:none; }
@@ -80,4 +135,17 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
   .form-page, .account-page { padding:30px 0 50px; }
   .form-card, .account-card { padding:28px 22px; }
   .account-details p { align-items:flex-start; flex-direction:column; gap:5px; }
+  .listing-page { padding:30px 0 50px; }
+  .listing-filters { flex-direction:column; }
+  .listing-filters select { min-width:0; }
+  .parts-grid { grid-template-columns:1fr; }
+  .details-card { grid-template-columns:1fr; }
+  .details-image { min-height:260px; }
+  .details-copy { padding:28px 22px; }
+  .details-list p { align-items:flex-start; flex-direction:column; gap:5px; }
+  .details-list span { text-align:left; }
+  .form-grid { grid-template-columns:1fr; }
+  .confirmation-modal { padding:28px 22px; }
+  .modal-actions { flex-direction:column-reverse; }
+  .modal-actions button { width:100%; }
 }

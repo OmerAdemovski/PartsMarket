@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 function Login({ onLogin }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const location = useLocation()
+  const [error, setError] = useState(() => location.state?.message || '')
   const navigate = useNavigate()
 
   async function handleSubmit(event) {
@@ -20,7 +21,7 @@ function Login({ onLogin }) {
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Login failed.')
       onLogin(data.user)
-      navigate('/account')
+      navigate(location.state?.from || '/account', { replace: true, state: null })
     } catch (requestError) { setError(requestError.message || 'Unable to log in right now.')
     } finally { setLoading(false) }
   }
