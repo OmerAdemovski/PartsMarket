@@ -20,6 +20,11 @@ function getClearCookieOptions() {
   return options
 }
 
+function setAuthCookie(res, userId) {
+  const token = generateToken(userId)
+  res.cookie(cookieName, token, getCookieOptions())
+}
+
 function publicUser(user) {
   return {
     id: user._id,
@@ -54,9 +59,10 @@ async function register(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await User.create({ name, email, password: hashedPassword })
+    setAuthCookie(res, user._id)
 
     return res.status(201).json({
-      message: 'Registration successful.',
+      message: 'Registration successful. You are now logged in.',
       user: publicUser(user),
     })
   } catch (error) {
@@ -84,8 +90,7 @@ async function login(req, res) {
       return res.status(401).json({ message: 'Invalid email or password.' })
     }
 
-    const token = generateToken(user._id)
-    res.cookie(cookieName, token, getCookieOptions())
+    setAuthCookie(res, user._id)
 
     return res.json({
       message: 'Login successful.',

@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Home() {
   const [searchTerm, setSearchTerm] = useState('')
+  const navigate = useNavigate()
+
+  function handleSearch(event) {
+    event.preventDefault()
+    const search = searchTerm.trim()
+    navigate(search ? `/parts?search=${encodeURIComponent(search)}` : '/parts')
+  }
 
   return (
     <>
@@ -14,10 +21,10 @@ function Home() {
             Find quality used car parts from real people, or turn the parts in
             your garage into someone else&apos;s perfect fix.
           </p>
-          <div className="search-box">
+          <form className="search-box" onSubmit={handleSearch}>
             <input type="search" placeholder="Search for a part, make, or model" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} aria-label="Search for car parts" />
-            <button type="button" className="primary-button">Search</button>
-          </div>
+            <button type="submit" className="primary-button">Search</button>
+          </form>
         </div>
         <div className="hero-art" aria-label="Illustration of a car part" role="img">
           <span className="art-circle circle-one"></span><span className="art-circle circle-two"></span>

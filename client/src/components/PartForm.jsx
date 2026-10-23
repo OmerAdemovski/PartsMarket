@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getImageUrl } from '../utils/parts.js'
 
 const emptyForm = {
@@ -12,9 +12,14 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
   } : emptyForm)
   const [selectedImage, setSelectedImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(() => getImageUrl(part?.imagePath))
+  const previewUrlRef = useRef('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  useEffect(() => () => {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
+  }, [])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -35,8 +40,11 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
       return
     }
     setError('')
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
+    const previewUrl = URL.createObjectURL(image)
+    previewUrlRef.current = previewUrl
     setSelectedImage(image)
-    setImagePreview(URL.createObjectURL(image))
+    setImagePreview(previewUrl)
   }
 
   async function handleSubmit(event) {

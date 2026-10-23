@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PartCard from '../components/PartCard.jsx'
 
 function BrowseParts() {
+  const [searchParams] = useSearchParams()
   const [parts, setParts] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '')
   const [category, setCategory] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
