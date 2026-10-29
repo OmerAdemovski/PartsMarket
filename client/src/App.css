@@ -78,6 +78,14 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
 .listing-filters input, .listing-filters select { background:var(--white); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:12px 14px; }
 .listing-filters input { flex:1; min-width:0; }
 .listing-filters select { min-width:190px; }
+.catalogue-filters { background:var(--white); border:1px solid var(--line); border-radius:12px; margin:24px 0 28px; padding:22px; }
+.filter-main-search { display:flex; flex-direction:column; gap:8px; }
+.filter-main-search label, .filter-grid label { font-size:13px; font-weight:600; }
+.filter-main-search input, .filter-grid input, .filter-grid select { background:var(--white); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:11px 12px; width:100%; }
+.filter-grid { display:grid; gap:14px 16px; grid-template-columns:repeat(4, 1fr); margin-top:16px; }
+.filter-grid label { display:flex; flex-direction:column; gap:7px; }
+.filter-grid input:focus, .filter-grid select:focus, .filter-main-search input:focus { border-color:var(--green); outline:2px solid var(--mint); }
+.filter-actions { display:flex; gap:10px; margin-top:20px; }
 .parts-grid { display:grid; gap:18px; grid-template-columns:repeat(3, 1fr); }
 .part-card { background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
 .part-card-link { display:block; }
@@ -166,6 +174,7 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
   .details-list p { align-items:flex-start; flex-direction:column; gap:5px; }
   .details-list span { text-align:left; }
   .form-grid { grid-template-columns:1fr; }
+  .filter-grid { grid-template-columns:1fr; }
   .confirmation-modal { padding:28px 22px; }
   .company-details-card { padding:28px 22px; }
   .company-details-header { align-items:flex-start; flex-direction:column; }

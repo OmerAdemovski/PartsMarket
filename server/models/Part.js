@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { qualities } = require('../utils/catalogue')
 
 const partSchema = new mongoose.Schema(
   {
@@ -22,6 +23,7 @@ const partSchema = new mongoose.Schema(
       required: [true, 'Please choose a category.'],
       trim: true,
     },
+    subcategory: { type: String, trim: true },
     condition: {
       type: String,
       required: [true, 'Please enter the condition of the part.'],
@@ -29,6 +31,10 @@ const partSchema = new mongoose.Schema(
     },
     carBrand: { type: String, trim: true },
     carModel: { type: String, trim: true },
+    vehicleYearFrom: { type: Number, min: 1900, max: 2100 },
+    vehicleYearTo: { type: Number, min: 1900, max: 2100 },
+    partNumber: { type: String, trim: true },
+    quality: { type: String, enum: qualities },
     location: {
       type: String,
       required: [true, 'Please enter a location.'],
@@ -39,6 +45,8 @@ const partSchema = new mongoose.Schema(
       required: [true, 'Please enter contact information.'],
       trim: true,
     },
+    city: { type: String, trim: true },
+    sellerType: { type: String, enum: ['individual', 'company'], default: 'individual' },
     imagePath: { type: String, trim: true },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
@@ -48,5 +56,9 @@ const partSchema = new mongoose.Schema(
   },
   { timestamps: true },
 )
+
+partSchema.path('vehicleYearTo').validate(function (value) {
+  return value === undefined || this.vehicleYearFrom === undefined || value >= this.vehicleYearFrom
+}, 'The ending vehicle year must be the same as or later than the starting year.')
 
 module.exports = mongoose.model('Part', partSchema)

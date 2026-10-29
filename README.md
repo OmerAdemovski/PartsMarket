@@ -9,8 +9,8 @@ PartsMarket is a beginner-friendly full-stack marketplace for buying and selling
 - MongoDB storage through Mongoose
 - Create, view, edit, and delete used-part listings
 - Local image uploads
-- Search by title, car brand, or car model
-- Category filtering
+- Structured catalogue fields for brands, categories, subcategories, vehicle years, part numbers, quality, city, and seller type
+- Server-side combined filtering and sorting for listings
 - Owner-only editing and deletion
 - Individual and company account types
 - Public company profiles and company profile management
@@ -117,7 +117,7 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `POST` | `/api/auth/login` | Public | Log in and create a session. |
 | `POST` | `/api/auth/logout` | Public | Clear the authentication cookie. |
 | `GET` | `/api/auth/me` | Protected | Return the current user. |
-| `GET` | `/api/parts` | Public | Return all listings. |
+| `GET` | `/api/parts` | Public | Return listings; supports search, catalogue, year, price, seller, and sorting query filters. |
 | `GET` | `/api/parts/:id` | Public | Return one listing. |
 | `GET` | `/api/companies` | Public | Return company profiles. |
 | `GET` | `/api/companies/:id` | Public | Return one company profile. |
@@ -128,7 +128,7 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `DELETE` | `/api/parts/:id` | Protected and owner-only | Delete a listing and its stored image. |
 | `GET` | `/api/health` | Public | Check server and MongoDB status. |
 
-Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, category, condition, car brand, car model, location, and contact.
+Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, category, subcategory, condition, brand, model, vehicle years, part number, quality, location, city, and contact.
 
 ## React state with `useState`
 
@@ -136,7 +136,7 @@ The project uses `useState` for small, understandable pieces of page state:
 
 - `App.jsx` stores the current user and initial authentication loading state.
 - `Home.jsx` stores the homepage search text.
-- `BrowseParts.jsx` stores listings, search text, category selection, loading, and errors.
+- `BrowseParts.jsx` stores URL-backed catalogue filters, listings, count, loading, and errors.
 - `Login.jsx` and `Register.jsx` store form fields, loading, errors, and messages.
 - `PartForm.jsx` stores form values, selected image, preview, loading, and status messages.
 - `EditPart.jsx` and `PartDetails.jsx` store loaded listing data and request status.

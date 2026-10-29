@@ -21,6 +21,12 @@ fs.mkdirSync(uploadsPath, { recursive: true })
 
 app.use(cors({ origin: clientUrl, credentials: true }))
 app.use(express.json())
+app.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && (error.status === 400 || error.statusCode === 400) && (error.type === 'entity.parse.failed' || error.body)) {
+    return res.status(400).json({ message: 'Please send valid JSON.' })
+  }
+  return next(error)
+})
 app.use(cookieParser())
 app.use('/uploads', express.static(uploadsPath))
 app.use('/api/auth', authRoutes)

@@ -55,7 +55,7 @@ async function saveMyCompany(req, res) {
     const company = await CompanyProfile.findOneAndUpdate(
       { owner: req.user._id },
       { $set: values },
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true },
+      { returnDocument: 'after', upsert: true, runValidators: true, setDefaultsOnInsert: true },
     ).select('-__v')
     return res.json({ message: 'Company profile saved.', company })
   } catch (error) {

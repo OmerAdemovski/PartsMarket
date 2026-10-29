@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { getImageUrl } from '../utils/parts.js'
+import { BRANDS, CATEGORIES, CONDITIONS, QUALITIES, YEARS } from '../utils/catalogue.js'
 
 const emptyForm = {
-  title: '', description: '', price: '', category: '', condition: '', carBrand: '', carModel: '', location: '', contact: '',
+  title: '', description: '', price: '', category: '', subcategory: '', condition: '', carBrand: '', carModel: '', vehicleYearFrom: '', vehicleYearTo: '', partNumber: '', quality: '', location: '', city: '', contact: '',
 }
 
 function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpired }) {
   const [formData, setFormData] = useState(() => part ? {
     title: part.title || '', description: part.description || '', price: part.price || '', category: part.category || '',
-    condition: part.condition || '', carBrand: part.carBrand || '', carModel: part.carModel || '', location: part.location || '', contact: part.contact || '',
+    subcategory: part.subcategory || '', condition: part.condition || '', carBrand: part.carBrand || '', carModel: part.carModel || '', vehicleYearFrom: part.vehicleYearFrom || '', vehicleYearTo: part.vehicleYearTo || '', partNumber: part.partNumber || '', quality: part.quality || '', location: part.location || '', city: part.city || '', contact: part.contact || '',
   } : emptyForm)
   const [selectedImage, setSelectedImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(() => getImageUrl(part?.imagePath))
@@ -59,6 +60,7 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
       setError('Price must be a positive number.')
       return
     }
+    if (formData.vehicleYearFrom && formData.vehicleYearTo && Number(formData.vehicleYearTo) < Number(formData.vehicleYearFrom)) { setError('The ending vehicle year must be the same as or later than the starting year.'); return }
 
     const body = new FormData()
     Object.entries(formData).forEach(([name, value]) => body.append(name, value))
@@ -88,11 +90,17 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
     <div className="form-grid">
       <label>Title *<input name="title" value={formData.title} onChange={handleChange} /></label>
       <label>Price *<input name="price" type="number" min="0.01" step="0.01" value={formData.price} onChange={handleChange} /></label>
-      <label>Category *<input name="category" value={formData.category} onChange={handleChange} placeholder="Engine, body, interior..." /></label>
-      <label>Condition *<input name="condition" value={formData.condition} onChange={handleChange} placeholder="Used - good" /></label>
-      <label>Car brand<input name="carBrand" value={formData.carBrand} onChange={handleChange} /></label>
+      <label>Category *<select name="category" value={formData.category} onChange={(event) => setFormData((current) => ({ ...current, category: event.target.value, subcategory: '' }))}><option value="">Choose a category</option>{formData.category && !CATEGORIES[formData.category] && <option value={formData.category}>{formData.category} (legacy)</option>}{Object.keys(CATEGORIES).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <label>Subcategory<select name="subcategory" value={formData.subcategory} onChange={handleChange} disabled={!formData.category}><option value="">Choose a subcategory</option>{formData.subcategory && !(CATEGORIES[formData.category] || []).includes(formData.subcategory) && <option value={formData.subcategory}>{formData.subcategory} (legacy)</option>}{(CATEGORIES[formData.category] || []).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <label>Condition *<select name="condition" value={formData.condition} onChange={handleChange}><option value="">Choose a condition</option>{formData.condition && !CONDITIONS.includes(formData.condition) && <option value={formData.condition}>{formData.condition} (legacy)</option>}{CONDITIONS.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <label>Quality<select name="quality" value={formData.quality} onChange={handleChange}><option value="">Choose a quality</option>{QUALITIES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <label>Car brand<select name="carBrand" value={formData.carBrand} onChange={handleChange}><option value="">Choose a brand</option>{formData.carBrand && !BRANDS.includes(formData.carBrand) && <option value={formData.carBrand}>{formData.carBrand} (legacy)</option>}{BRANDS.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       <label>Car model<input name="carModel" value={formData.carModel} onChange={handleChange} /></label>
+      <label>Year from<select name="vehicleYearFrom" value={formData.vehicleYearFrom} onChange={handleChange}><option value="">Any year</option>{YEARS.map((year) => <option key={year} value={year}>{year}</option>)}</select></label>
+      <label>Year to<select name="vehicleYearTo" value={formData.vehicleYearTo} onChange={handleChange}><option value="">Any year</option>{YEARS.map((year) => <option key={year} value={year}>{year}</option>)}</select></label>
+      <label>Part number<input name="partNumber" value={formData.partNumber} onChange={handleChange} /></label>
       <label>Location *<input name="location" value={formData.location} onChange={handleChange} /></label>
+      <label>City<input name="city" value={formData.city} onChange={handleChange} /></label>
       <label>Contact *<input name="contact" value={formData.contact} onChange={handleChange} /></label>
     </div>
     <label>Description *<textarea name="description" rows="5" value={formData.description} onChange={handleChange} /></label>

@@ -3,6 +3,7 @@ import { getImageUrl } from '../utils/parts.js'
 
 function PartCard({ part, actions, className = '' }) {
   const carDetails = [part.carBrand, part.carModel].filter(Boolean).join(' ')
+  const catalogueDetails = [part.subcategory, part.partNumber].filter(Boolean).join(' · ')
 
   return (
     <article className={`part-card ${className}`}>
@@ -13,6 +14,7 @@ function PartCard({ part, actions, className = '' }) {
           <h2>{part.title}</h2>
           <p className="part-meta">{part.condition} · {part.location}</p>
           {carDetails && <p className="part-meta">For {carDetails}</p>}
+          {catalogueDetails && <p className="part-meta">{catalogueDetails}</p>}
           <p className="part-seller">Sold by {part.seller?.name || 'PartsMarket seller'}</p>
         </div>
       </Link>
