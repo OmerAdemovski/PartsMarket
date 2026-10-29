@@ -51,6 +51,13 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
 .form-card label { font-size:14px; font-weight:600; margin-top:10px; }
 .form-card input { border:1px solid var(--line); border-radius:8px; padding:12px; }
 .form-card input:focus { border-color:var(--green); outline:2px solid var(--mint); }
+.form-card textarea { border:1px solid var(--line); border-radius:8px; font:inherit; padding:12px; resize:vertical; }
+.form-card textarea:focus { border-color:var(--green); outline:2px solid var(--mint); }
+.account-type-options { border:1px solid var(--line); border-radius:8px; display:grid; gap:10px; margin:18px 0 0; padding:16px; }
+.account-type-options legend { font-size:14px; font-weight:600; padding:0 5px; }
+.account-type-options label { font-weight:400; margin:0; }
+.account-type-options input { margin-right:8px; padding:0; }
+.account-type-options span, .field-help { color:var(--muted); font-size:12px; font-weight:400; }
 .form-button { margin-top:18px; }
 .form-button:disabled { cursor:wait; opacity:.65; }
 .form-footer { color:var(--muted); font-size:14px; margin-bottom:0; }
@@ -119,6 +126,19 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
 .form-image-preview { border-radius:8px; display:block; margin-top:18px; max-height:260px; max-width:100%; object-fit:cover; }
 .empty-card { background:var(--white); border:1px solid var(--line); border-radius:12px; margin-top:28px; padding:28px; }
 .empty-card p { color:var(--muted); margin-top:0; }
+.company-grid { display:grid; gap:18px; grid-template-columns:repeat(3, 1fr); }
+.company-card { background:var(--white); border:1px solid var(--line); border-radius:12px; display:flex; gap:16px; padding:22px; }
+.company-card:hover { border-color:var(--green); }
+.company-card h2 { font-size:22px; letter-spacing:-.5px; margin-bottom:8px; }
+.company-card p, .company-card span { color:var(--muted); font-size:14px; line-height:1.5; }
+.company-card p { margin:0 0 10px; }
+.company-logo { align-items:center; background:var(--mint); border-radius:10px; color:var(--dark-green); display:flex; flex:0 0 62px; font-family:'Space Grotesk', sans-serif; font-size:18px; font-weight:700; height:62px; justify-content:center; overflow:hidden; }
+.company-logo img { height:100%; object-fit:cover; width:100%; }
+.company-details-card { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:48px; }
+.company-details-header { align-items:center; display:flex; gap:22px; }
+.company-details-header h1 { font-size:clamp(38px, 6vw, 64px); }
+.large-logo { flex-basis:100px; height:100px; }
+.account-link { margin-top:24px; }
 @media (max-width:760px) {
   .page-shell { padding:0 18px 28px; }
   .navbar { padding:20px 0; }
@@ -139,6 +159,7 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
   .listing-filters { flex-direction:column; }
   .listing-filters select { min-width:0; }
   .parts-grid { grid-template-columns:1fr; }
+  .company-grid { grid-template-columns:1fr; }
   .details-card { grid-template-columns:1fr; }
   .details-image { min-height:260px; }
   .details-copy { padding:28px 22px; }
@@ -146,6 +167,8 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
   .details-list span { text-align:left; }
   .form-grid { grid-template-columns:1fr; }
   .confirmation-modal { padding:28px 22px; }
+  .company-details-card { padding:28px 22px; }
+  .company-details-header { align-items:flex-start; flex-direction:column; }
   .modal-actions { flex-direction:column-reverse; }
   .modal-actions button { width:100%; }
 }

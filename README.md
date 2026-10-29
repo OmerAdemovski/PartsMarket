@@ -12,6 +12,8 @@ PartsMarket is a beginner-friendly full-stack marketplace for buying and selling
 - Search by title, car brand, or car model
 - Category filtering
 - Owner-only editing and deletion
+- Individual and company account types
+- Public company profiles and company profile management
 - Responsive desktop and mobile interface
 - Friendly handling when an authentication session expires
 
@@ -117,6 +119,10 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `GET` | `/api/auth/me` | Protected | Return the current user. |
 | `GET` | `/api/parts` | Public | Return all listings. |
 | `GET` | `/api/parts/:id` | Public | Return one listing. |
+| `GET` | `/api/companies` | Public | Return company profiles. |
+| `GET` | `/api/companies/:id` | Public | Return one company profile. |
+| `GET` | `/api/companies/me` | Protected company account | Return the current company profile. |
+| `PUT` | `/api/companies/me` | Protected company account | Create or update the current company profile. |
 | `POST` | `/api/parts` | Protected | Create a listing, optionally with an image. |
 | `PUT` | `/api/parts/:id` | Protected and owner-only | Edit a listing, optionally replacing its image. |
 | `DELETE` | `/api/parts/:id` | Protected and owner-only | Delete a listing and its stored image. |

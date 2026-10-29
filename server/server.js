@@ -8,6 +8,7 @@ const mongoose = require('mongoose')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const partRoutes = require('./routes/partRoutes')
+const companyRoutes = require('./routes/companyRoutes')
 
 dotenv.config()
 
@@ -24,6 +25,7 @@ app.use(cookieParser())
 app.use('/uploads', express.static(uploadsPath))
 app.use('/api/auth', authRoutes)
 app.use('/api/parts', partRoutes)
+app.use('/api/companies', companyRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({

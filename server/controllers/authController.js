@@ -30,6 +30,7 @@ function publicUser(user) {
     id: user._id,
     name: user.name,
     email: user.email,
+    accountType: user.accountType || 'individual',
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   }
@@ -43,10 +44,11 @@ async function register(req, res) {
   const name = typeof req.body.name === 'string' ? req.body.name.trim() : ''
   const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : ''
   const password = typeof req.body.password === 'string' ? req.body.password : ''
+  const accountType = req.body.accountType || 'individual'
 
-  if (!name || !isValidEmail(email) || password.length < 6) {
+  if (!name || !isValidEmail(email) || password.length < 6 || !['individual', 'company'].includes(accountType)) {
     return res.status(400).json({
-      message: 'Name, a valid email, and a password of at least 6 characters are required.',
+      message: 'Name, a valid email, a password of at least 6 characters, and a valid account type are required.',
     })
   }
 
@@ -58,7 +60,7 @@ async function register(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await User.create({ name, email, password: hashedPassword })
+    const user = await User.create({ name, email, password: hashedPassword, accountType })
     setAuthCookie(res, user._id)
 
     return res.status(201).json({
