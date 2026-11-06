@@ -32,7 +32,7 @@ function EditPart({ currentUser, onAuthExpired }) {
   if (error) return <main className="form-page"><div className="message error-message">{error}</div><Link className="outline-button back-link" to="/parts">Back to browse</Link></main>
   if (!isPartOwner(part, currentUser)) return <main className="form-page"><div className="message error-message">You can only edit your own listings.</div><Link className="outline-button back-link" to={`/parts/${id}`}>Back to listing</Link></main>
 
-  return <main className="form-page listing-form-page"><div className="form-card wide-form-card"><p className="eyebrow">YOUR LISTING</p><h1>Edit part</h1><p className="form-intro">Update the details or choose a replacement photo.</p><PartForm key={part._id} part={part} submitUrl={`http://localhost:5000/api/parts/${id}`} method="PUT" submitLabel="Save changes" onSuccess={() => navigate(`/parts/${id}`)} onAuthExpired={onAuthExpired} /></div></main>
+  return <main className="form-page listing-form-page"><div className="form-card wide-form-card"><p className="eyebrow">YOUR LISTING</p><h1>Edit part</h1><p className="form-intro">Update the details or choose a replacement photo.</p><PartForm key={part._id} part={part} currentUser={currentUser} submitUrl={`http://localhost:5000/api/parts/${id}`} method="PUT" submitLabel="Save changes" onSuccess={() => navigate(`/parts/${id}`)} onAuthExpired={onAuthExpired} /></div></main>
 }
 
 export default EditPart

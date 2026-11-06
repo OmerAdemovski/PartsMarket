@@ -11,7 +11,9 @@ function Header({ currentUser, onLogout }) {
           <>
             <Link className="primary-button" to="/parts/new">Sell a Part</Link>
             <Link to="/my-parts">My Listings</Link>
+            <Link to="/my-orders">My Orders</Link>
             {currentUser.accountType === 'company' && <Link to="/company-profile">Company Profile</Link>}
+            {currentUser.accountType === 'company' && <Link to="/company-orders">Company Orders</Link>}
             <Link to="/account">Account</Link>
             <button type="button" className="outline-button" onClick={onLogout}>Log out</button>
           </>

@@ -14,6 +14,8 @@ PartsMarket is a beginner-friendly full-stack marketplace for buying and selling
 - Owner-only editing and deletion
 - Individual and company account types
 - Public company profiles and company profile management
+- Simulated checkout for company listings
+- Buyer orders and company order management
 - Responsive desktop and mobile interface
 - Friendly handling when an authentication session expires
 
@@ -82,6 +84,7 @@ PartsMarket/
    - `JWT_SECRET` — a long random secret used to sign JWTs.
    - `CLIENT_URL` — frontend origin, normally `http://localhost:5173`.
    - `PORT` — backend port, normally `5000`; the server has this default if it is omitted.
+   - `DEMO_DELIVERY_FEE` — fixed demonstration fee for company delivery, normally `15`.
 
    Use your own local values. Do not commit `server/.env`.
 
@@ -123,12 +126,18 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `GET` | `/api/companies/:id` | Public | Return one company profile. |
 | `GET` | `/api/companies/me` | Protected company account | Return the current company profile. |
 | `PUT` | `/api/companies/me` | Protected company account | Create or update the current company profile. |
+| `POST` | `/api/orders` | Protected | Create a simulated order for a company listing. |
+| `GET` | `/api/orders/my-orders` | Protected | Return orders for the current buyer. |
+| `GET` | `/api/orders/company-orders` | Protected company account | Return incoming orders for the current company. |
+| `GET` | `/api/orders/:id` | Protected buyer or seller | Return one authorized order. |
+| `PATCH` | `/api/orders/:id/status` | Selling company | Advance an order status. |
+| `PATCH` | `/api/orders/:id/cancel` | Authorized buyer or selling company | Cancel an eligible order and restore stock once. |
 | `POST` | `/api/parts` | Protected | Create a listing, optionally with an image. |
 | `PUT` | `/api/parts/:id` | Protected and owner-only | Edit a listing, optionally replacing its image. |
 | `DELETE` | `/api/parts/:id` | Protected and owner-only | Delete a listing and its stored image. |
 | `GET` | `/api/health` | Public | Check server and MongoDB status. |
 
-Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, category, subcategory, condition, brand, model, vehicle years, part number, quality, location, city, and contact.
+Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, stock quantity, category, subcategory, condition, brand, model, vehicle years, part number, quality, location, city, and contact. Checkout is simulated only; the API never accepts or stores card numbers or bank credentials.
 
 ## React state with `useState`
 
@@ -142,6 +151,7 @@ The project uses `useState` for small, understandable pieces of page state:
 - `EditPart.jsx` and `PartDetails.jsx` store loaded listing data and request status.
 - `MyParts.jsx` stores the user’s listings, deletion state, modal state, and errors.
 - `Account.jsx` stores whether the email address is visible.
+- `Checkout.jsx`, `MyOrders.jsx`, `CompanyOrders.jsx`, and `OrderDetails.jsx` store order form, loading, action, and result state.
 
 ## Image uploads
 

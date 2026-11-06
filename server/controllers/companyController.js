@@ -43,6 +43,17 @@ async function getCompany(req, res) {
   }
 }
 
+async function getCompanyByOwner(req, res) {
+  if (!isValidId(req.params.ownerId)) return res.status(400).json({ message: 'Please provide a valid company owner ID.' })
+  try {
+    const company = await CompanyProfile.findOne({ owner: req.params.ownerId }).select('-__v')
+    if (!company) return res.status(404).json({ message: 'Company profile not found.' })
+    return res.json({ company })
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to load the company right now.' })
+  }
+}
+
 async function getMyCompany(req, res) {
   const company = await CompanyProfile.findOne({ owner: req.user._id }).select('-__v')
   return res.json({ company })
@@ -67,4 +78,4 @@ async function saveMyCompany(req, res) {
   }
 }
 
-module.exports = { getCompanies, getCompany, getMyCompany, saveMyCompany }
+module.exports = { getCompanies, getCompany, getCompanyByOwner, getMyCompany, saveMyCompany }

@@ -5,7 +5,7 @@ const Part = require('../models/Part')
 const { removeUploadedFile } = require('../middleware/uploadMiddleware')
 const { brands, categories, qualities, isSupportedCategory, isValidSubcategory } = require('../utils/catalogue')
 
-const editableFields = ['title', 'description', 'price', 'category', 'subcategory', 'condition', 'carBrand', 'carModel', 'vehicleYearFrom', 'vehicleYearTo', 'partNumber', 'quality', 'location', 'city', 'contact']
+const editableFields = ['title', 'description', 'price', 'category', 'subcategory', 'condition', 'carBrand', 'carModel', 'vehicleYearFrom', 'vehicleYearTo', 'partNumber', 'quality', 'location', 'city', 'contact', 'stockQuantity']
 
 function isValidPartId(id) {
   return mongoose.isValidObjectId(id)
@@ -22,6 +22,9 @@ function getPartValues(body) {
   if (values.price !== undefined && values.price !== '') {
     values.price = Number(values.price)
   }
+  if (values.stockQuantity !== undefined && values.stockQuantity !== '') {
+    values.stockQuantity = Number(values.stockQuantity)
+  }
 
   ;['vehicleYearFrom', 'vehicleYearTo'].forEach((field) => {
     if (values[field] === '') delete values[field]
@@ -36,6 +39,7 @@ function getPartValues(body) {
 
 function validatePartValues(values) {
   if (values.price !== undefined && (!Number.isFinite(values.price) || values.price <= 0)) return 'Price must be a positive number.'
+  if (values.stockQuantity !== undefined && (!Number.isInteger(values.stockQuantity) || values.stockQuantity < 1)) return 'Stock quantity must be a positive whole number.'
   if (values.carBrand && !brands.includes(values.carBrand)) return 'Please choose a supported vehicle brand.'
   if (values.category && !isSupportedCategory(values.category)) return 'Please choose a supported catalogue category.'
   if (values.subcategory && (!values.category || !isValidSubcategory(values.category, values.subcategory))) return 'Please choose a subcategory that belongs to the selected category.'
@@ -147,6 +151,7 @@ async function createPart(req, res) {
   const values = getPartValues(req.body)
   values.seller = req.user.id
   values.sellerType = req.user.accountType || 'individual'
+  if (values.sellerType === 'individual') values.stockQuantity = 1
   if (req.file) values.imagePath = getImagePath(req.file)
   const validationMessage = validatePartValues(values)
   if (validationMessage) { removeUploadedFile(req.file); return res.status(400).json({ message: validationMessage }) }
@@ -180,6 +185,7 @@ async function updatePart(req, res) {
   const oldImagePath = part.imagePath
   const values = getPartValues(req.body)
   values.sellerType = req.user.accountType || 'individual'
+  if (values.sellerType === 'individual') values.stockQuantity = 1
   if (req.file) values.imagePath = getImagePath(req.file)
   if (Object.keys(values).length === 0) {
     removeUploadedFile(req.file)

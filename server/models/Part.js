@@ -18,6 +18,12 @@ const partSchema = new mongoose.Schema(
       required: [true, 'Please enter a price for the part.'],
       min: [0.01, 'Price must be greater than zero.'],
     },
+    stockQuantity: {
+      type: Number,
+      min: [1, 'Stock quantity must be at least 1.'],
+      validate: { validator: Number.isInteger, message: 'Stock quantity must be a whole number.' },
+      default: 1,
+    },
     category: {
       type: String,
       required: [true, 'Please choose a category.'],

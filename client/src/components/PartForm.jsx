@@ -3,12 +3,12 @@ import { getImageUrl } from '../utils/parts.js'
 import { BRANDS, CATEGORIES, CONDITIONS, QUALITIES, YEARS } from '../utils/catalogue.js'
 
 const emptyForm = {
-  title: '', description: '', price: '', category: '', subcategory: '', condition: '', carBrand: '', carModel: '', vehicleYearFrom: '', vehicleYearTo: '', partNumber: '', quality: '', location: '', city: '', contact: '',
+  title: '', description: '', price: '', stockQuantity: 1, category: '', subcategory: '', condition: '', carBrand: '', carModel: '', vehicleYearFrom: '', vehicleYearTo: '', partNumber: '', quality: '', location: '', city: '', contact: '',
 }
 
-function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpired }) {
+function PartForm({ part, currentUser, submitUrl, method, submitLabel, onSuccess, onAuthExpired }) {
   const [formData, setFormData] = useState(() => part ? {
-    title: part.title || '', description: part.description || '', price: part.price || '', category: part.category || '',
+    title: part.title || '', description: part.description || '', price: part.price || '', category: part.category || '', stockQuantity: part.stockQuantity || 1,
     subcategory: part.subcategory || '', condition: part.condition || '', carBrand: part.carBrand || '', carModel: part.carModel || '', vehicleYearFrom: part.vehicleYearFrom || '', vehicleYearTo: part.vehicleYearTo || '', partNumber: part.partNumber || '', quality: part.quality || '', location: part.location || '', city: part.city || '', contact: part.contact || '',
   } : emptyForm)
   const [selectedImage, setSelectedImage] = useState(null)
@@ -60,6 +60,7 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
       setError('Price must be a positive number.')
       return
     }
+    if (currentUser?.accountType === 'company' && (!Number.isInteger(Number(formData.stockQuantity)) || Number(formData.stockQuantity) < 1)) { setError('Stock quantity must be a positive whole number.'); return }
     if (formData.vehicleYearFrom && formData.vehicleYearTo && Number(formData.vehicleYearTo) < Number(formData.vehicleYearFrom)) { setError('The ending vehicle year must be the same as or later than the starting year.'); return }
 
     const body = new FormData()
@@ -90,6 +91,7 @@ function PartForm({ part, submitUrl, method, submitLabel, onSuccess, onAuthExpir
     <div className="form-grid">
       <label>Title *<input name="title" value={formData.title} onChange={handleChange} /></label>
       <label>Price *<input name="price" type="number" min="0.01" step="0.01" value={formData.price} onChange={handleChange} /></label>
+      {currentUser?.accountType === 'company' && <label>Stock quantity *<input name="stockQuantity" type="number" min="1" step="1" value={formData.stockQuantity} onChange={handleChange} /></label>}
       <label>Category *<select name="category" value={formData.category} onChange={(event) => setFormData((current) => ({ ...current, category: event.target.value, subcategory: '' }))}><option value="">Choose a category</option>{formData.category && !CATEGORIES[formData.category] && <option value={formData.category}>{formData.category} (legacy)</option>}{Object.keys(CATEGORIES).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       <label>Subcategory<select name="subcategory" value={formData.subcategory} onChange={handleChange} disabled={!formData.category}><option value="">Choose a subcategory</option>{formData.subcategory && !(CATEGORIES[formData.category] || []).includes(formData.subcategory) && <option value={formData.subcategory}>{formData.subcategory} (legacy)</option>}{(CATEGORIES[formData.category] || []).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       <label>Condition *<select name="condition" value={formData.condition} onChange={handleChange}><option value="">Choose a condition</option>{formData.condition && !CONDITIONS.includes(formData.condition) && <option value={formData.condition}>{formData.condition} (legacy)</option>}{CONDITIONS.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
