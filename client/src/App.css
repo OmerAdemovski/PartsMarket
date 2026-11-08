@@ -168,6 +168,34 @@ h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-2px; }
 .timeline-item { align-items:center; color:var(--muted); display:flex; gap:12px; position:relative; }
 .timeline-item span { align-items:center; background:var(--line); border-radius:50%; color:var(--ink); display:flex; font-size:12px; height:24px; justify-content:center; left:-38px; position:absolute; width:24px; }
 .timeline-item.complete, .timeline-item.current { color:var(--dark-green); }.timeline-item.complete span, .timeline-item.current span { background:var(--green); color:var(--white); }
+.company-card-rating { color:var(--dark-green) !important; font-weight:700; margin-top:12px !important; }
+.company-rating-summary { align-items:flex-start; border-bottom:1px solid var(--line); border-top:1px solid var(--line); display:flex; gap:28px; justify-content:space-between; margin:30px 0; padding:20px 0; }
+.company-rating-summary strong { font-size:22px; }
+.company-rating-summary span { color:var(--muted); display:block; font-size:13px; margin-top:6px; }
+.company-rating-summary .star-display { display:inline-flex; margin-top:0; }
+.company-rating-summary .star-display > span { display:inline; margin-top:0; }
+.star-display { color:var(--line); display:inline-flex; gap:2px; margin-left:8px; }
+.star-display .star-filled, .star-button.selected { color:#d99a20; }
+.rating-distribution { color:var(--muted); display:grid; font-size:13px; gap:4px; text-align:right; }
+.reviews-section { border-top:1px solid var(--line); margin-top:34px; padding-top:28px; }
+.reviews-section h2, .review-form-section h2 { font-size:28px; letter-spacing:-1px; }
+.review-card { border:1px solid var(--line); border-radius:10px; margin-top:14px; padding:18px; }
+.review-card-heading { align-items:flex-start; display:flex; justify-content:space-between; gap:14px; }
+.review-card-heading time { color:var(--muted); font-size:12px; }
+.review-card p { color:var(--muted); line-height:1.6; margin:14px 0; white-space:pre-wrap; }
+.verified-label { color:var(--green); font-size:12px; font-weight:700; }
+.review-form-section { border-top:1px solid var(--line); margin-top:30px; padding-top:28px; }
+.review-form-section > p { margin:10px 0 16px; }
+.review-form { margin-top:14px; }
+.review-form label { display:flex; flex-direction:column; font-size:14px; font-weight:600; gap:8px; margin-top:18px; }
+.review-form textarea { border:1px solid var(--line); border-radius:8px; font:inherit; padding:12px; resize:vertical; }
+.review-rating { border:0; margin:0; padding:0; }
+.review-rating legend { font-size:14px; font-weight:600; }
+.review-rating div { display:flex; gap:3px; margin-top:8px; }
+.star-button { background:transparent; border:0; color:var(--line); font-size:30px; line-height:1; padding:2px; }
+.star-button:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
+.existing-review { background:#f4f7f2; border-radius:8px; margin-top:20px; padding:14px; }
+.existing-review p { color:var(--muted); margin:10px 0 0; white-space:pre-wrap; }
 @media (max-width:760px) {
   .page-shell { padding:0 18px 28px; }
   .navbar { padding:20px 0; }

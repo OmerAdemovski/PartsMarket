@@ -16,6 +16,7 @@ PartsMarket is a beginner-friendly full-stack marketplace for buying and selling
 - Public company profiles and company profile management
 - Simulated checkout for company listings
 - Buyer orders and company order management
+- Verified company ratings and reviews from delivered company orders
 - Responsive desktop and mobile interface
 - Friendly handling when an authentication session expires
 
@@ -132,12 +133,19 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `GET` | `/api/orders/:id` | Protected buyer or seller | Return one authorized order. |
 | `PATCH` | `/api/orders/:id/status` | Selling company | Advance an order status. |
 | `PATCH` | `/api/orders/:id/cancel` | Authorized buyer or selling company | Cancel an eligible order and restore stock once. |
+| `POST` | `/api/reviews` | Protected buyer | Create one verified review for a delivered company order. |
+| `PATCH` | `/api/reviews/:id` | Review owner only | Edit the buyer's verified review. |
+| `DELETE` | `/api/reviews/:id` | Review owner only | Delete the buyer's verified review. |
+| `GET` | `/api/reviews/company/:companyId` | Public | Return newest verified company reviews plus average, count, and 1–5 distribution. |
+| `GET` | `/api/reviews/order/:orderId` | Protected buyer | Return the buyer's review for an order, if one exists. |
 | `POST` | `/api/parts` | Protected | Create a listing, optionally with an image. |
 | `PUT` | `/api/parts/:id` | Protected and owner-only | Edit a listing, optionally replacing its image. |
 | `DELETE` | `/api/parts/:id` | Protected and owner-only | Delete a listing and its stored image. |
 | `GET` | `/api/health` | Public | Check server and MongoDB status. |
 
 Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, stock quantity, category, subcategory, condition, brand, model, vehicle years, part number, quality, location, city, and contact. Checkout is simulated only; the API never accepts or stores card numbers or bank credentials.
+
+Reviews are available only to the buyer of a company order after that order reaches `delivered`. Each order can have one review, with a whole-number rating from 1 to 5 and an optional comment up to 1000 characters. Public company responses include calculated rating summaries and reviewer names only; reviewer email and private order details are never exposed.
 
 ## React state with `useState`
 

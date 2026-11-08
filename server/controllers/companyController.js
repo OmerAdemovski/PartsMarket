@@ -2,10 +2,11 @@ const mongoose = require('mongoose')
 const CompanyProfile = require('../models/CompanyProfile')
 const { DELIVERY_METHODS, PAYMENT_METHODS, isExactMethodList } = require('../utils/companyMethods')
 const { isCompleteCompanyProfile } = require('../utils/companyProfile')
+const { getCompanyReviewSummary, getCompanyReviewSummaries } = require('../utils/reviewSummary')
 
-function withCompleteness(company) {
+function withCompleteness(company, reviewSummary) {
   if (!company) return null
-  return { ...company.toObject(), complete: isCompleteCompanyProfile(company) }
+  return { ...company.toObject(), complete: isCompleteCompanyProfile(company), reviewSummary, averageRating: reviewSummary.averageRating, totalReviews: reviewSummary.totalReviews, reviewCount: reviewSummary.totalReviews, ratingDistribution: reviewSummary.ratingDistribution }
 }
 
 const profileFields = [
@@ -32,8 +33,9 @@ function isValidId(id) {
 
 async function getCompanies(req, res) {
   try {
-    const companies = (await CompanyProfile.find().sort({ companyName: 1 }).select('-__v')).map(withCompleteness)
-    return res.json({ companies })
+    const companies = await CompanyProfile.find().sort({ companyName: 1 }).select('-__v')
+    const summaries = await getCompanyReviewSummaries(companies.map((company) => company._id))
+    return res.json({ companies: companies.map((company) => withCompleteness(company, summaries.get(String(company._id)))) })
   } catch (error) {
     return res.status(500).json({ message: 'Unable to load companies right now.' })
   }
@@ -44,7 +46,7 @@ async function getCompany(req, res) {
   try {
     const company = await CompanyProfile.findById(req.params.id).select('-__v')
     if (!company) return res.status(404).json({ message: 'Company profile not found.' })
-    return res.json({ company: withCompleteness(company) })
+    return res.json({ company: withCompleteness(company, await getCompanyReviewSummary(company._id)) })
   } catch (error) {
     return res.status(500).json({ message: 'Unable to load the company right now.' })
   }
@@ -55,7 +57,7 @@ async function getCompanyByOwner(req, res) {
   try {
     const company = await CompanyProfile.findOne({ owner: req.params.ownerId }).select('-__v')
     if (!company) return res.status(404).json({ message: 'Seller must complete company settings before checkout.' })
-    return res.json({ company: withCompleteness(company) })
+    return res.json({ company: withCompleteness(company, await getCompanyReviewSummary(company._id)) })
   } catch (error) {
     return res.status(500).json({ message: 'Unable to load the company right now.' })
   }
@@ -63,7 +65,7 @@ async function getCompanyByOwner(req, res) {
 
 async function getMyCompany(req, res) {
   const company = await CompanyProfile.findOne({ owner: req.user._id }).select('-__v')
-  return res.json({ company: withCompleteness(company) })
+  return res.json({ company: company ? withCompleteness(company, await getCompanyReviewSummary(company._id)) : null })
 }
 
 async function saveMyCompany(req, res) {
@@ -77,7 +79,7 @@ async function saveMyCompany(req, res) {
       { $set: values },
       { returnDocument: 'after', upsert: true, runValidators: true, setDefaultsOnInsert: true },
     ).select('-__v')
-    return res.json({ message: 'Company profile saved.', company: withCompleteness(company) })
+    return res.json({ message: 'Company profile saved.', company: withCompleteness(company, await getCompanyReviewSummary(company._id)) })
   } catch (error) {
     if (error.name === 'ValidationError') {
       const firstError = Object.values(error.errors)[0]
