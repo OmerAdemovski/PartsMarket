@@ -2,8 +2,10 @@ const fs = require('fs')
 const path = require('path')
 const mongoose = require('mongoose')
 const Part = require('../models/Part')
+const CompanyProfile = require('../models/CompanyProfile')
 const { removeUploadedFile } = require('../middleware/uploadMiddleware')
 const { brands, categories, qualities, isSupportedCategory, isValidSubcategory } = require('../utils/catalogue')
+const { isCompleteCompanyProfile } = require('../utils/companyProfile')
 
 const editableFields = ['title', 'description', 'price', 'category', 'subcategory', 'condition', 'carBrand', 'carModel', 'vehicleYearFrom', 'vehicleYearTo', 'partNumber', 'quality', 'location', 'city', 'contact', 'stockQuantity']
 
@@ -148,6 +150,10 @@ async function getPart(req, res) {
 }
 
 async function createPart(req, res) {
+  if ((req.user.accountType || 'individual') === 'company' && !isCompleteCompanyProfile(await CompanyProfile.findOne({ owner: req.user._id }))) {
+    removeUploadedFile(req.file)
+    return res.status(400).json({ message: 'Please complete your company profile before creating a company listing.' })
+  }
   const values = getPartValues(req.body)
   values.seller = req.user.id
   values.sellerType = req.user.accountType || 'individual'
@@ -180,6 +186,10 @@ async function updatePart(req, res) {
   if (part.seller.toString() !== req.user.id) {
     removeUploadedFile(req.file)
     return res.status(403).json({ message: 'You can only edit your own part listings.' })
+  }
+  if ((req.user.accountType || 'individual') === 'company' && !isCompleteCompanyProfile(await CompanyProfile.findOne({ owner: req.user._id }))) {
+    removeUploadedFile(req.file)
+    return res.status(400).json({ message: 'Please complete your company profile before editing a company listing.' })
   }
 
   const oldImagePath = part.imagePath

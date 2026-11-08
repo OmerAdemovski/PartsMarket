@@ -2,17 +2,9 @@ const mongoose = require('mongoose')
 const CompanyProfile = require('../models/CompanyProfile')
 const Order = require('../models/Order')
 const Part = require('../models/Part')
-
-const statuses = ['pending', 'accepted', 'preparing', 'ready-for-pickup', 'shipped', 'delivered', 'cancelled']
-const transitions = {
-  pending: ['accepted', 'cancelled'],
-  accepted: ['preparing', 'cancelled'],
-  preparing: ['ready-for-pickup', 'shipped'],
-  'ready-for-pickup': ['delivered'],
-  shipped: ['delivered'],
-  delivered: [],
-  cancelled: [],
-}
+const { DELIVERY_METHODS, PAYMENT_METHODS } = require('../utils/companyMethods')
+const { ORDER_STATUSES, isAllowedStatusTransition } = require('../utils/orderStatus')
+const { isCompleteCompanyProfile } = require('../utils/companyProfile')
 
 function isValidId(id) {
   return mongoose.isValidObjectId(id)
@@ -24,16 +16,12 @@ function getDemoDeliveryFee() {
 }
 
 function hasMethod(methods, requested) {
-  return methods.some((method) => {
-    const value = String(method).trim().toLowerCase()
-    if (requested === 'pickup') return value === 'pickup'
-    return ['company-delivery', 'company delivery', 'delivery', 'courier'].includes(value)
-  })
+  return Array.isArray(methods) && methods.includes(requested) && DELIVERY_METHODS.includes(requested)
 }
 
 function hasPaymentMethod(methods, requested) {
   const wanted = requested.trim().toLowerCase()
-  return methods.some((method) => String(method).trim().toLowerCase() === wanted)
+  return Array.isArray(methods) && PAYMENT_METHODS.includes(wanted) && methods.includes(wanted)
 }
 
 function safePopulate(query) {
@@ -60,9 +48,9 @@ async function createOrder(req, res) {
     if (String(part.seller._id) === String(req.user._id)) return orderError(res, 403, 'You cannot buy your own listing.')
 
     const companyProfile = await CompanyProfile.findOne({ owner: part.seller._id })
-    if (!companyProfile) return orderError(res, 400, 'This company has not completed its company profile.')
+    if (!isCompleteCompanyProfile(companyProfile)) return orderError(res, 400, 'Seller must complete company settings before checkout.')
     if (!hasMethod(companyProfile.deliveryMethods, deliveryMethod)) return orderError(res, 400, 'That delivery method is not available for this company.')
-    if (typeof paymentMethod !== 'string' || !paymentMethod.trim() || !hasPaymentMethod(companyProfile.paymentMethods, paymentMethod)) return orderError(res, 400, 'That payment method is not available for this company.')
+    if (typeof paymentMethod !== 'string' || !PAYMENT_METHODS.includes(paymentMethod) || !hasPaymentMethod(companyProfile.paymentMethods, paymentMethod)) return orderError(res, 400, 'That payment method is not available for this company.')
 
     const currentStock = Number.isInteger(part.stockQuantity) ? part.stockQuantity : 1
     if (requestedQuantity > currentStock) return orderError(res, 400, 'There is not enough stock for that quantity.')
@@ -83,7 +71,7 @@ async function createOrder(req, res) {
         part: part._id,
         productSnapshot: { title: part.title, imagePath: part.imagePath, partNumber: part.partNumber, brand: part.carBrand, model: part.carModel },
         companySnapshot: { companyName: companyProfile.companyName, address: companyProfile.address, phone: companyProfile.phone, email: companyProfile.email },
-        quantity: requestedQuantity, unitPrice, subtotal, deliveryMethod, deliveryFee, total, paymentMethod: paymentMethod.trim(), deliveryAddress: deliveryMethod === 'company-delivery' ? deliveryAddress.trim() : '', buyerPhone: buyerPhone.trim(), buyerNotes: typeof buyerNotes === 'string' ? buyerNotes.trim() : '',
+        quantity: requestedQuantity, unitPrice, subtotal, deliveryMethod, deliveryFee, total, paymentMethod, deliveryAddress: deliveryMethod === 'company-delivery' ? deliveryAddress.trim() : '', buyerPhone: buyerPhone.trim(), buyerNotes: typeof buyerNotes === 'string' ? buyerNotes.trim() : '',
       })
       const savedOrder = await safePopulate(Order.findById(order._id))
       return res.status(201).json({ message: 'Demonstration order created.', order: savedOrder, priceBreakdown: { unitPrice, quantity: requestedQuantity, subtotal, deliveryFee, total } })
@@ -118,14 +106,12 @@ async function getOrder(req, res) {
 async function updateOrderStatus(req, res) {
   if (!isValidId(req.params.id)) return orderError(res, 400, 'Please provide a valid order ID.')
   const nextStatus = req.body.status
-  if (!statuses.includes(nextStatus) || nextStatus === 'cancelled') return orderError(res, 400, 'Please choose a valid next order status.')
+  if (!ORDER_STATUSES.includes(nextStatus) || nextStatus === 'cancelled') return orderError(res, 400, 'Please choose a valid next order status.')
   try {
     const order = await Order.findById(req.params.id)
     if (!order) return orderError(res, 404, 'Order not found.')
     if (String(order.seller) !== String(req.user._id)) return orderError(res, 403, 'Only the selling company can update this order.')
-    if (!transitions[order.status].includes(nextStatus)) return orderError(res, 400, `An order cannot move from ${order.status} to ${nextStatus}.`)
-    if (order.deliveryMethod === 'pickup' && nextStatus === 'shipped') return orderError(res, 400, 'Pickup orders cannot be shipped.')
-    if (order.deliveryMethod === 'company-delivery' && nextStatus === 'ready-for-pickup') return orderError(res, 400, 'Delivery orders cannot be marked ready for pickup.')
+    if (!isAllowedStatusTransition(order.deliveryMethod, order.status, nextStatus)) return orderError(res, 400, `An order cannot move from ${order.status} to ${nextStatus}.`)
     order.status = nextStatus
     await order.save()
     return res.json({ message: 'Order status updated.', order: await safePopulate(Order.findById(order._id)) })

@@ -2,13 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_BASE_URL, getImageUrl } from '../utils/parts.js'
 import { formatMoney } from '../utils/orders.js'
+import { DELIVERY_METHODS, PAYMENT_METHODS, methodLabel, validMethodValues } from '../utils/companyMethods.js'
 
 function deliveryChoices(methods = []) {
-  const values = methods.map((method) => String(method).trim().toLowerCase())
-  return [
-    values.includes('pickup') ? 'pickup' : null,
-    values.some((method) => ['company-delivery', 'company delivery', 'delivery', 'courier'].includes(method)) ? 'company-delivery' : null,
-  ].filter(Boolean)
+  return validMethodValues(methods, DELIVERY_METHODS)
 }
 
 function Checkout({ onAuthExpired }) {
@@ -34,7 +31,9 @@ function Checkout({ onAuthExpired }) {
         const companyData = await companyResponse.json()
         if (!companyResponse.ok) throw new Error(companyData.message || 'Unable to load the company profile.')
         const deliveries = deliveryChoices(companyData.company.deliveryMethods)
-        setPart(partData.part); setCompany(companyData.company); setForm((current) => ({ ...current, deliveryMethod: deliveries[0] || '', paymentMethod: companyData.company.paymentMethods[0] || '' }))
+        const payments = validMethodValues(companyData.company.paymentMethods, PAYMENT_METHODS)
+        if (!companyData.company.complete || !deliveries.length || !payments.length) throw new Error('Checkout is temporarily unavailable. The seller must update their company delivery and payment settings.')
+        setPart(partData.part); setCompany({ ...companyData.company, paymentMethods: payments }); setForm((current) => ({ ...current, deliveryMethod: deliveries[0] || '', paymentMethod: payments[0] || '' }))
       } catch (requestError) { setError(requestError.message || 'Unable to load checkout right now.')
       } finally { setLoading(false) }
     }
@@ -63,7 +62,7 @@ function Checkout({ onAuthExpired }) {
   if (error && !part) return <main className="form-page"><div className="form-card"><p className="message error-message" role="alert">{error}</p><Link to="/parts">Back to parts</Link></div></main>
   if (!part || !company) return null
   const deliveries = deliveryChoices(company.deliveryMethods)
-  return <main className="form-page"><div className="form-card wide-form-card"><p className="eyebrow">SIMULATED CHECKOUT</p><h1>Buy this part</h1><p className="demo-notice">Demonstration checkout — no real payment is processed.</p>{error && <p className="message error-message" role="alert">{error}</p>}{validationError && <p className="message error-message" role="alert">{validationError}</p>}{result && <p className="message success-message" role="status">Order created. Opening your order details...</p>}<div className="checkout-summary">{part.imagePath && <img src={getImageUrl(part.imagePath)} alt={part.title} />}<div><h2>{part.title}</h2><p>{company.companyName}</p><p>{formatMoney(part.price)} each · {part.stockQuantity ?? 1} available</p></div></div><form className="part-form" onSubmit={handleSubmit}><div className="form-grid"><label>Quantity *<input name="quantity" type="number" min="1" max={part.stockQuantity ?? 1} value={form.quantity} onChange={updateField} /></label><label>Delivery method *<select name="deliveryMethod" value={form.deliveryMethod} onChange={updateField}><option value="">Choose delivery</option>{deliveries.map((method) => <option key={method} value={method}>{method === 'pickup' ? 'Pickup' : 'Company delivery'}</option>)}</select></label><label>Payment method *<select name="paymentMethod" value={form.paymentMethod} onChange={updateField}><option value="">Choose payment</option>{company.paymentMethods.map((method) => <option key={method} value={method}>{method}</option>)}</select></label><label>Buyer phone *<input name="buyerPhone" value={form.buyerPhone} onChange={updateField} /></label></div>{form.deliveryMethod === 'company-delivery' && <label>Delivery address *<textarea name="deliveryAddress" rows="3" value={form.deliveryAddress} onChange={updateField} /></label>}<label>Notes (optional)<textarea name="buyerNotes" rows="3" value={form.buyerNotes} onChange={updateField} /></label><button className="primary-button form-button" type="submit" disabled={submitting}>{submitting ? 'Creating order...' : 'Place demonstration order'}</button></form></div></main>
+  return <main className="form-page"><div className="form-card wide-form-card"><p className="eyebrow">SIMULATED CHECKOUT</p><h1>Buy this part</h1><p className="demo-notice">Demonstration checkout — no real payment is processed.</p>{error && <p className="message error-message" role="alert">{error}</p>}{validationError && <p className="message error-message" role="alert">{validationError}</p>}{result && <p className="message success-message" role="status">Order created. Opening your order details...</p>}<div className="checkout-summary">{part.imagePath && <img src={getImageUrl(part.imagePath)} alt={part.title} />}<div><h2>{part.title}</h2><p>{company.companyName}</p><p>{formatMoney(part.price)} each · {part.stockQuantity ?? 1} available</p></div></div><form className="part-form" onSubmit={handleSubmit}><div className="form-grid"><label>Quantity *<input name="quantity" type="number" min="1" max={part.stockQuantity ?? 1} value={form.quantity} onChange={updateField} /></label><label>Delivery method *<select name="deliveryMethod" value={form.deliveryMethod} onChange={updateField}><option value="">Choose delivery</option>{deliveries.map((method) => <option key={method} value={method}>{methodLabel(method, DELIVERY_METHODS)}</option>)}</select></label><label>Payment method *<select name="paymentMethod" value={form.paymentMethod} onChange={updateField}><option value="">Choose payment</option>{company.paymentMethods.map((method) => <option key={method} value={method}>{methodLabel(method, PAYMENT_METHODS)}</option>)}</select></label><label>Buyer phone *<input name="buyerPhone" value={form.buyerPhone} onChange={updateField} /></label></div>{form.deliveryMethod === 'company-delivery' && <label>Delivery address *<textarea name="deliveryAddress" rows="3" value={form.deliveryAddress} onChange={updateField} /></label>}<label>Notes (optional)<textarea name="buyerNotes" rows="3" value={form.buyerNotes} onChange={updateField} /></label><button className="primary-button form-button" type="submit" disabled={submitting}>{submitting ? 'Creating order...' : 'Place demonstration order'}</button></form></div></main>
 }
 
 export default Checkout

@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs')
 const User = require('../models/User')
+const CompanyProfile = require('../models/CompanyProfile')
 const generateToken = require('../utils/generateToken')
+const { DELIVERY_METHODS, PAYMENT_METHODS, isExactMethodList } = require('../utils/companyMethods')
+const { isCompleteCompanyProfile } = require('../utils/companyProfile')
 
 const cookieName = 'token'
 const cookieMaxAge = 7 * 24 * 60 * 60 * 1000
@@ -40,16 +43,39 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+async function getPublicUser(user) {
+  const publicData = publicUser(user)
+  const companyProfile = user.accountType === 'company' ? await CompanyProfile.findOne({ owner: user._id }) : null
+  publicData.companyProfileComplete = user.accountType !== 'company' || isCompleteCompanyProfile(companyProfile)
+  return publicData
+}
+
 async function register(req, res) {
   const name = typeof req.body.name === 'string' ? req.body.name.trim() : ''
   const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : ''
   const password = typeof req.body.password === 'string' ? req.body.password : ''
   const accountType = req.body.accountType || 'individual'
+  const companyDeliveryMethods = req.body.deliveryMethods || req.body.companyDeliveryMethods
+  const companyPaymentMethods = req.body.paymentMethods || req.body.companyPaymentMethods
+  const companyName = typeof req.body.companyName === 'string' ? req.body.companyName.trim() : ''
+  const companyDescriptionValue = req.body.description || req.body.companyDescription
+  const companyPhoneValue = req.body.phone || req.body.companyPhone
+  const companyAddressValue = req.body.address || req.body.companyAddress
+  const companyDescription = typeof companyDescriptionValue === 'string' ? companyDescriptionValue.trim() : ''
+  const companyPhone = typeof companyPhoneValue === 'string' ? companyPhoneValue.trim() : ''
+  const companyEmail = typeof req.body.companyEmail === 'string' && req.body.companyEmail.trim() ? req.body.companyEmail.trim().toLowerCase() : email
+  const companyAddress = typeof companyAddressValue === 'string' ? companyAddressValue.trim() : ''
 
   if (!name || !isValidEmail(email) || password.length < 6 || !['individual', 'company'].includes(accountType)) {
     return res.status(400).json({
       message: 'Name, a valid email, a password of at least 6 characters, and a valid account type are required.',
     })
+  }
+  if (accountType === 'company' && (!isExactMethodList(companyDeliveryMethods, DELIVERY_METHODS) || !isExactMethodList(companyPaymentMethods, PAYMENT_METHODS))) {
+    return res.status(400).json({ message: 'Company accounts must choose at least one valid delivery method and payment method.' })
+  }
+  if (accountType === 'company' && (!companyName || !companyDescription || !companyPhone || !isValidEmail(companyEmail) || !companyAddress)) {
+    return res.status(400).json({ message: 'Company name, description, phone, business email, and address are required.' })
   }
 
   try {
@@ -61,11 +87,19 @@ async function register(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await User.create({ name, email, password: hashedPassword, accountType })
+    if (accountType === 'company') {
+      try {
+        await CompanyProfile.create({ companyName, description: companyDescription, phone: companyPhone, email: companyEmail, address: companyAddress, deliveryMethods: companyDeliveryMethods, paymentMethods: companyPaymentMethods, estimatedDeliveryText: 'Contact company', owner: user._id })
+      } catch (profileError) {
+        await User.deleteOne({ _id: user._id })
+        throw profileError
+      }
+    }
     setAuthCookie(res, user._id)
 
     return res.status(201).json({
       message: 'Registration successful. You are now logged in.',
-      user: publicUser(user),
+      user: await getPublicUser(user),
     })
   } catch (error) {
     if (error.code === 11000) {
@@ -96,7 +130,7 @@ async function login(req, res) {
 
     return res.json({
       message: 'Login successful.',
-      user: publicUser(user),
+      user: await getPublicUser(user),
     })
   } catch (error) {
     return res.status(500).json({ message: 'Unable to log in right now.' })
@@ -109,7 +143,7 @@ function logout(req, res) {
 }
 
 function me(req, res) {
-  return res.json({ user: publicUser(req.user) })
+  return getPublicUser(req.user).then((user) => res.json({ user }))
 }
 
 module.exports = { register, login, logout, me }

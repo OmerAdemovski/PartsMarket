@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import OrderCard from '../components/OrderCard.jsx'
 import { API_BASE_URL } from '../utils/parts.js'
-import { ORDER_STATUS_LABELS } from '../utils/orders.js'
-
-const nextStatuses = { pending: ['accepted'], accepted: ['preparing'], preparing: ['ready-for-pickup', 'shipped'], 'ready-for-pickup': ['delivered'], shipped: ['delivered'] }
+import { getNextOrderStatuses, ORDER_STATUS_LABELS } from '../utils/orders.js'
 
 function CompanyOrders({ onAuthExpired }) {
   const [orders, setOrders] = useState([])
@@ -38,7 +36,7 @@ function CompanyOrders({ onAuthExpired }) {
     } finally { setSavingId('') }
   }
 
-  return <main className="listing-page"><p className="eyebrow">SELLER AREA</p><h1>Company orders</h1><p className="form-intro">Manage incoming simulated purchases for your company.</p>{loading && <p className="status-message">Loading orders...</p>}{error && <p className="message error-message" role="alert">{error}</p>}{actionError && <p className="message error-message" role="alert">{actionError}</p>}{!loading && !error && orders.length === 0 && <div className="empty-card"><p>No incoming orders yet.</p></div>}<div className="orders-grid">{orders.map((order) => <article className="order-card" key={order._id}><OrderCard order={order} currentUser={{ id: order.seller._id }} onCancel={(id) => updateOrder(id, 'cancel')} /><div className="company-order-info"><p><strong>Buyer</strong> {order.buyer.name} · {order.buyer.email}</p><p><strong>Phone</strong> {order.buyerPhone}</p>{order.deliveryAddress && <p><strong>Address</strong> {order.deliveryAddress}</p>}</div>{nextStatuses[order.status]?.length > 0 && <div className="status-controls">{nextStatuses[order.status].map((status) => <button className="outline-button" type="button" key={status} disabled={savingId === order._id} onClick={() => updateOrder(order._id, 'status', { status })}>Mark {ORDER_STATUS_LABELS[status]}</button>)}</div>}</article>)}</div></main>
+  return <main className="listing-page"><p className="eyebrow">SELLER AREA</p><h1>Company orders</h1><p className="form-intro">Manage incoming simulated purchases for your company.</p>{loading && <p className="status-message">Loading orders...</p>}{error && <p className="message error-message" role="alert">{error}</p>}{actionError && <p className="message error-message" role="alert">{actionError}</p>}{!loading && !error && orders.length === 0 && <div className="empty-card"><p>No incoming orders yet.</p></div>}<div className="orders-grid">{orders.map((order) => <article className="order-card" key={order._id}><OrderCard order={order} currentUser={{ id: order.seller._id }} onCancel={(id) => updateOrder(id, 'cancel')} /><div className="company-order-info"><p><strong>Buyer</strong> {order.buyer.name} · {order.buyer.email}</p><p><strong>Phone</strong> {order.buyerPhone}</p>{order.deliveryAddress && <p><strong>Address</strong> {order.deliveryAddress}</p>}</div>{getNextOrderStatuses(order).length > 0 && <div className="status-controls">{getNextOrderStatuses(order).map((status) => <button className="outline-button" type="button" key={status} disabled={savingId === order._id} onClick={() => updateOrder(order._id, 'status', { status })}>Mark {ORDER_STATUS_LABELS[status]}</button>)}</div>}</article>)}</div></main>
 }
 
 export default CompanyOrders

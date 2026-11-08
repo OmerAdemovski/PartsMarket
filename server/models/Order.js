@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema(
     deliveryMethod: { type: String, enum: ['company-delivery', 'pickup'], required: true },
     deliveryFee: { type: Number, required: true, min: 0 },
     total: { type: Number, required: true, min: 0 },
-    paymentMethod: { type: String, required: true, trim: true },
+    paymentMethod: { type: String, enum: ['cash-on-delivery', 'pay-at-pickup', 'bank-transfer'], required: true },
     deliveryAddress: { type: String, trim: true },
     buyerPhone: { type: String, required: true, trim: true },
     buyerNotes: { type: String, trim: true },

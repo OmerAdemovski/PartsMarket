@@ -21,7 +21,7 @@ function Login({ onLogin }) {
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Login failed.')
       onLogin(data.user)
-      navigate(location.state?.from || '/account', { replace: true, state: null })
+      navigate(data.user.accountType === 'company' && !data.user.companyProfileComplete ? '/company-profile' : (location.state?.from || '/account'), { replace: true, state: null })
     } catch (requestError) { setError(requestError.message || 'Unable to log in right now.')
     } finally { setLoading(false) }
   }
