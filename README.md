@@ -17,6 +17,7 @@ PartsMarket is a beginner-friendly full-stack marketplace for buying and selling
 - Simulated checkout for company listings
 - Buyer orders and company order management
 - Verified company ratings and reviews from delivered company orders
+- Private buyer-company complaints and order disputes
 - Responsive desktop and mobile interface
 - Friendly handling when an authentication session expires
 
@@ -138,6 +139,13 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 | `DELETE` | `/api/reviews/:id` | Review owner only | Delete the buyer's verified review. |
 | `GET` | `/api/reviews/company/:companyId` | Public | Return newest verified company reviews plus average, count, and 1–5 distribution. |
 | `GET` | `/api/reviews/order/:orderId` | Protected buyer | Return the buyer's review for an order, if one exists. |
+| `POST` | `/api/complaints` | Protected buyer | Open one private complaint for an eligible company order. |
+| `GET` | `/api/complaints/my` | Protected buyer | List the current buyer's private complaints. |
+| `GET` | `/api/complaints/company` | Protected company account | List private complaints for the current company. |
+| `GET` | `/api/complaints/:id` | Protected participant | Return one private complaint conversation. |
+| `POST` | `/api/complaints/:id/messages` | Protected participant | Add a buyer or company reply while unresolved. |
+| `PATCH` | `/api/complaints/:id/resolve` | Protected buyer | Mark a complaint resolved. |
+| `GET` | `/api/complaints/order/:orderId` | Protected order participant | Return the complaint for one order, if it exists. |
 | `POST` | `/api/parts` | Protected | Create a listing, optionally with an image. |
 | `PUT` | `/api/parts/:id` | Protected and owner-only | Edit a listing, optionally replacing its image. |
 | `DELETE` | `/api/parts/:id` | Protected and owner-only | Delete a listing and its stored image. |
@@ -146,6 +154,8 @@ Authentication uses the JWT cookie created by registration or login. Protected e
 Create and update requests use `multipart/form-data` when an image is included. Listing fields include title, description, price, stock quantity, category, subcategory, condition, brand, model, vehicle years, part number, quality, location, city, and contact. Checkout is simulated only; the API never accepts or stores card numbers or bank credentials.
 
 Reviews are available only to the buyer of a company order after that order reaches `delivered`. Each order can have one review, with a whole-number rating from 1 to 5 and an optional comment up to 1000 characters. Public company responses include calculated rating summaries and reviewer names only; reviewer email and private order details are never exposed.
+
+Complaints are private buyer-company conversations for company orders that are no longer pending. Each order can have one complaint, with a predefined category, a subject up to 120 characters, and messages up to 2000 characters. Only the order buyer and selling company can read or reply. Buyers can resolve complaints; there is no administrator dashboard in this stage.
 
 ## React state with `useState`
 

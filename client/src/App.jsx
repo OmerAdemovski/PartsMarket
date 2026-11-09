@@ -10,10 +10,13 @@ import BrowseParts from './pages/BrowseParts.jsx'
 import EditPart from './pages/EditPart.jsx'
 import Checkout from './pages/Checkout.jsx'
 import CompanyOrders from './pages/CompanyOrders.jsx'
+import CompanyComplaints from './pages/CompanyComplaints.jsx'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import MyParts from './pages/MyParts.jsx'
 import MyOrders from './pages/MyOrders.jsx'
+import MyComplaints from './pages/MyComplaints.jsx'
+import ComplaintDetails from './pages/ComplaintDetails.jsx'
 import OrderDetails from './pages/OrderDetails.jsx'
 import PartDetails from './pages/PartDetails.jsx'
 import Register from './pages/Register.jsx'
@@ -72,7 +75,9 @@ function App() {
     <Route path="/account" element={<Account currentUser={currentUser} />} />
     <Route path="/company-profile" element={protectedPage(companyPage(<CompanyProfile onAuthExpired={handleAuthExpired} />))} />
     <Route path="/parts/new" element={protectedPage(<SellPart currentUser={currentUser} onAuthExpired={handleAuthExpired} />)} /><Route path="/my-parts" element={protectedPage(<MyParts currentUser={currentUser} onAuthExpired={handleAuthExpired} />)} /><Route path="/my-orders" element={protectedPage(<MyOrders onAuthExpired={handleAuthExpired} />)} /><Route path="/orders/:id" element={protectedPage(<OrderDetails currentUser={currentUser} onAuthExpired={handleAuthExpired} />)} /><Route path="/checkout/:partId" element={protectedPage(<Checkout onAuthExpired={handleAuthExpired} />)} />
+    <Route path="/my-complaints" element={protectedPage(<MyComplaints onAuthExpired={handleAuthExpired} />)} /><Route path="/complaints/:id" element={protectedPage(<ComplaintDetails onAuthExpired={handleAuthExpired} />)} />
     <Route path="/company-orders" element={protectedPage(companyPage(<CompanyOrders onAuthExpired={handleAuthExpired} />))} />
+    <Route path="/company-complaints" element={protectedPage(companyPage(<CompanyComplaints onAuthExpired={handleAuthExpired} />))} />
     <Route path="/parts/:id/edit" element={protectedPage(<EditPart currentUser={currentUser} onAuthExpired={handleAuthExpired} />)} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></div>

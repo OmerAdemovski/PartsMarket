@@ -11,6 +11,7 @@ const partRoutes = require('./routes/partRoutes')
 const companyRoutes = require('./routes/companyRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 const reviewRoutes = require('./routes/reviewRoutes')
+const complaintRoutes = require('./routes/complaintRoutes')
 
 dotenv.config()
 
@@ -36,6 +37,7 @@ app.use('/api/parts', partRoutes)
 app.use('/api/companies', companyRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/reviews', reviewRoutes)
+app.use('/api/complaints', complaintRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({
